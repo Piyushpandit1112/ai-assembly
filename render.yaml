@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: ai-assembly
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app.main:app -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --timeout 180
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: AI_PROVIDER
+        value: openai
+      # ── LLM fallback chain (set at least ONE of these) ──
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: CEREBRAS_API_KEY
+        sync: false
+      - key: MISTRAL_API_KEY
+        sync: false
+      - key: TOGETHER_API_KEY
+        sync: false
+      # ── Optional custom OpenAI-compatible endpoint ──
+      - key: OPENAI_BASE_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        sync: false
+      # ── Free YouTube Data API v3 (real videos in lessons) ──
+      - key: YOUTUBE_API_KEY
+        sync: false

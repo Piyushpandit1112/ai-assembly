@@ -1,0 +1,103 @@
+{
+  "PIYUSH": {
+    "username": "PIYUSH",
+    "age": 10,
+    "joined": "2026-05-02T07:33:49.450176+00:00",
+    "english_score": 1,
+    "learning_usage": 1,
+    "idea_usage": 0,
+    "ai_usage": 1,
+    "prompt_usage": 0,
+    "total_sessions": 3,
+    "last_active": "2026-05-02T07:36:36.940180+00:00"
+  },
+  "piyu": {
+    "username": "piyu",
+    "age": 10,
+    "joined": "2026-05-02T07:46:26.618393+00:00",
+    "english_score": 0,
+    "learning_usage": 0,
+    "idea_usage": 0,
+    "ai_usage": 0,
+    "prompt_usage": 0,
+    "total_sessions": 0,
+    "last_active": "2026-05-02T07:46:26.618415+00:00"
+  },
+  "Alex": {
+    "username": "Alex",
+    "age": 10,
+    "joined": "2026-05-02T07:47:39.209608+00:00",
+    "english_score": 2,
+    "learning_usage": 1,
+    "idea_usage": 0,
+    "ai_usage": 0,
+    "prompt_usage": 0,
+    "total_sessions": 4,
+    "last_active": "2026-05-02T08:01:37.439322+00:00",
+    "brain_usage": 1
+  },
+  "p": {
+    "username": "p",
+    "age": 10,
+    "joined": "2026-05-02T07:50:11.331817+00:00",
+    "english_score": 3,
+    "learning_usage": 0,
+    "idea_usage": 1,
+    "ai_usage": 0,
+    "prompt_usage": 0,
+    "total_sessions": 4,
+    "last_active": "2026-05-02T08:20:10.040453+00:00"
+  },
+  "piyuds": {
+    "username": "piyuds",
+    "age": 10,
+    "joined": "2026-05-02T08:20:15.306076+00:00",
+    "english_score": 0,
+    "learning_usage": 0,
+    "idea_usage": 0,
+    "ai_usage": 0,
+    "prompt_usage": 0,
+    "brain_usage": 0,
+    "total_sessions": 0,
+    "last_active": "2026-05-02T08:20:15.306088+00:00"
+  },
+  "Pandit": {
+    "username": "Pandit",
+    "age": 10,
+    "joined": "2026-05-02T08:41:06.705961+00:00",
+    "english_score": 1,
+    "learning_usage": 0,
+    "idea_usage": 0,
+    "ai_usage": 0,
+    "prompt_usage": 0,
+    "brain_usage": 0,
+    "total_sessions": 1,
+    "last_active": "2026-05-02T08:47:35.787669+00:00"
+  },
+  "Pandu": {
+    "username": "Pandu",
+    "age": 10,
+    "joined": "2026-05-02T08:52:10.119977+00:00",
+    "english_score": 1,
+    "learning_usage": 1,
+    "idea_usage": 4,
+    "ai_usage": 0,
+    "prompt_usage": 0,
+    "brain_usage": 0,
+    "total_sessions": 6,
+    "last_active": "2026-05-02T09:24:51.883579+00:00"
+  },
+  "Piyush": {
+    "username": "Piyush",
+    "age": 10,
+    "joined": "2026-05-02T10:33:31.158717+00:00",
+    "english_score": 0,
+    "learning_usage": 0,
+    "idea_usage": 0,
+    "ai_usage": 0,
+    "prompt_usage": 0,
+    "brain_usage": 0,
+    "total_sessions": 0,
+    "last_active": "2026-05-02T10:33:31.158757+00:00"
+  }
+}

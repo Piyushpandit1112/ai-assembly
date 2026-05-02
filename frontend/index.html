@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Assembly ⚙️</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .game-icon { font-size: 3rem; margin-bottom: 8px; animation: pulse 2s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  WELCOME SCREEN — Kid-friendly, 3D, animated tutorial      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="welcome-screen" class="welcome-screen-v2">
+  <!-- floating background blobs -->
+  <div class="bg-blob b1"></div>
+  <div class="bg-blob b2"></div>
+  <div class="bg-blob b3"></div>
+  <!-- floating emoji constellation -->
+  <div class="float-emojis">
+    <span style="--x:5%;  --y:15%; --d:0s;">📚</span>
+    <span style="--x:88%; --y:20%; --d:1.5s;">🚀</span>
+    <span style="--x:12%; --y:75%; --d:3s;">💡</span>
+    <span style="--x:90%; --y:70%; --d:4.5s;">🏆</span>
+    <span style="--x:50%; --y:8%;  --d:2s;">⭐</span>
+    <span style="--x:75%; --y:88%; --d:5s;">🎮</span>
+    <span style="--x:25%; --y:40%; --d:6s;">🧩</span>
+    <span style="--x:65%; --y:50%; --d:3.5s;">🦊</span>
+  </div>
+
+  <div class="welcome-card-v2">
+    <!-- Animated mascot -->
+    <div class="welcome-mascot">
+      <div class="mascot-3d">
+        <div class="mascot-shadow"></div>
+        <div class="mascot-emoji-big">🦉</div>
+        <div class="mascot-sparkles">
+          <span>✨</span><span>⭐</span><span>💫</span>
+        </div>
+      </div>
+    </div>
+
+    <h1 class="welcome-title">
+      <span class="t1">AI</span> <span class="t2">Assembly</span> <span class="t3">⚙️</span>
+    </h1>
+    <p class="welcome-tag">🛠️ Build • 📚 Learn • 🚀 Ship</p>
+
+    <!-- Animated tutorial carousel -->
+    <div class="tutor-carousel">
+      <div class="tutor-track" id="tutor-track">
+        <div class="tutor-slide active">
+          <div class="tutor-icon bounce">🦉</div>
+          <h3>Hi! I'm Buddy</h3>
+          <p>Your AI friend that helps you learn anything — just by chatting!</p>
+        </div>
+        <div class="tutor-slide">
+          <div class="tutor-icon spin">📚</div>
+          <h3>Climb the English Path</h3>
+          <p>Learn grammar, speaking & writing — one fun lesson at a time.</p>
+        </div>
+        <div class="tutor-slide">
+          <div class="tutor-icon wiggle">🧩</div>
+          <h3>Brain Games</h3>
+          <p>Math sprint, memory match, riddles & quizzes to power up your brain!</p>
+        </div>
+        <div class="tutor-slide">
+          <div class="tutor-icon pop">💡</div>
+          <h3>Build Real Ideas</h3>
+          <p>Got a cool idea? Buddy will help you turn it into a real project plan!</p>
+        </div>
+        <div class="tutor-slide">
+          <div class="tutor-icon glow">🏆</div>
+          <h3>Earn XP & Badges</h3>
+          <p>Every activity = points. Keep your streak alive and unlock badges!</p>
+        </div>
+      </div>
+      <div class="tutor-dots" id="tutor-dots"></div>
+      <div class="tutor-nav">
+        <button onclick="tutorPrev()" class="tnav-btn">◀</button>
+        <button onclick="tutorPlayPause()" id="tutor-play-btn" class="tnav-btn play">⏸</button>
+        <button onclick="tutorNext()" class="tnav-btn">▶</button>
+      </div>
+    </div>
+
+    <details class="ollama-setup">
+      <summary>⚙️ First time? Setup Ollama (1 click)</summary>
+      <ol>
+        <li>Download: <a href="https://ollama.com" target="_blank">ollama.com</a></li>
+        <li>Run: <code>ollama pull llama3.2</code></li>
+        <li>Run: <code>ollama serve</code></li>
+      </ol>
+    </details>
+
+    <!-- Name & Age -->
+    <div class="welcome-name-form">
+      <input id="welcome-name" class="form-input" type="text" placeholder="✨ What's your name?" maxlength="30" autocomplete="off" />
+      <select id="welcome-age" class="form-input form-select" style="text-align:center;">
+        <option value="">🎂 Choose your age...</option>
+        <option value="6">6 years 🍼</option>
+        <option value="7">7 years</option>
+        <option value="8">8 years</option>
+        <option value="9">9 years</option>
+        <option value="10" selected>10 years</option>
+        <option value="11">11 years</option>
+        <option value="12">12 years</option>
+        <option value="13">13 years 🎬</option>
+        <option value="14">14 years</option>
+        <option value="15">15 years</option>
+        <option value="16">16 years 🚗</option>
+      </select>
+
+      <button class="cta-3d" onclick="startLearning()">
+        <span class="cta-emoji">🎮</span>
+        <span class="cta-text">START ADVENTURE!</span>
+        <span class="cta-arrow">→</span>
+      </button>
+      <p class="welcome-hint">No login. No password. Just fun! 🎉</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  APP SHELL (shown after user enters their name)            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="app-shell" style="display:none;">
+
+  <!-- ── Header with Gamification ─────────────────────────────── -->
+  <header class="app-header">
+    <div class="header-logo">
+      <span class="logo-icon" onclick="showTab('progress')" style="cursor:pointer;">🎓</span>
+      <span class="logo-text">AI Assembly</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px; margin-right:16px;">
+      <!-- Points Display -->
+      <div style="background:rgba(255,255,255,0.2); padding:8px 16px; border-radius:20px; display:flex; align-items:center; gap:6px; cursor:pointer;" onclick="showTab('progress')">
+        <span style="font-size:1.3rem;">⭐</span>
+        <span id="points-display" style="font-weight:900; color:white; font-size:1.1rem;">0</span>
+      </div>
+      <!-- User -->
+      <div class="header-user">
+        <div class="user-avatar" onclick="changeName()" title="Change name" style="cursor:pointer;">👤</div>
+        <span class="user-name-display" id="header-username">Friend</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Sidebar + Main Layout ───────────────────────────────── -->
+  <div class="app-layout">
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-section-title">MAIN</div>
+      <button id="side-dashboard" class="sidebar-item" onclick="showTab('dashboard')"><span class="sb-ico">🏠</span><span>Dashboard</span></button>
+      <button id="side-chat"      class="sidebar-item" onclick="showTab('chat')"><span class="sb-ico">🤖</span><span>Buddy AI</span></button>
+
+      <div class="sidebar-section-title">LEARN</div>
+      <button id="side-english"   class="sidebar-item" onclick="showTab('english')"><span class="sb-ico">📚</span><span>Learn English</span></button>
+      <button id="side-writing"   class="sidebar-item" onclick="showTab('writing')"><span class="sb-ico">📝</span><span>Fix My Writing</span></button>
+      <button id="side-learn"     class="sidebar-item" onclick="showTab('learn')"><span class="sb-ico">🌍</span><span>Topics</span></button>
+      <button id="side-idea"      class="sidebar-item" onclick="showTab('idea')"><span class="sb-ico">💡</span><span>Idea Lab</span></button>
+
+      <div class="sidebar-section-title">PLAY</div>
+      <button id="side-brain"     class="sidebar-item" onclick="showTab('brain')"><span class="sb-ico">🧩</span><span>Brain Games</span></button>
+      <button id="side-progress"  class="sidebar-item" onclick="showTab('progress')"><span class="sb-ico">🏆</span><span>My Badges</span></button>
+
+      <div class="sidebar-mascot">
+        <div class="mascot-emoji">🦊</div>
+        <div class="mascot-text">Keep going! You're crushing it.</div>
+      </div>
+    </aside>
+
+  <!-- ── Main Content Area ───────────────────────────────────── -->
+  <main class="main-content">
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!--  TAB 0: DASHBOARD HOME                                -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="panel-dashboard" class="tab-panel active" role="tabpanel">
+      <div class="hero-banner">
+        <div class="hero-bg-shapes">
+          <span class="shape s1">🌟</span>
+          <span class="shape s2">🚀</span>
+          <span class="shape s3">📚</span>
+          <span class="shape s4">💡</span>
+        </div>
+        <div class="hero-text">
+          <p class="hero-greeting">Hi, <span id="dash-username">Friend</span>! 👋</p>
+          <h1 class="hero-title">Ready for today's adventure?</h1>
+          <p class="hero-sub">Learn English, play brain games, and build cool ideas — all in one place.</p>
+          <button class="hero-cta" onclick="showTab('english')">▶ Continue Learning</button>
+        </div>
+        <div class="hero-mascot">🤖</div>
+      </div>
+
+      <div class="dash-stats">
+        <div class="stat-tile tilt"><div class="st-ico">⭐</div><div class="st-num" id="dash-points">0</div><div class="st-lab">XP Points</div></div>
+        <div class="stat-tile tilt"><div class="st-ico">🔥</div><div class="st-num" id="dash-streak">0</div><div class="st-lab">Day Streak</div></div>
+        <div class="stat-tile tilt"><div class="st-ico">💚</div><div class="st-num" id="dash-xp">0</div><div class="st-lab">English XP</div></div>
+        <div class="stat-tile tilt"><div class="st-ico">❤️</div><div class="st-num" id="dash-hearts" style="font-size:1.2rem;">❤️❤️❤️❤️❤️</div><div class="st-lab">Hearts</div></div>
+        <div class="stat-tile tilt"><div class="st-ico">🏆</div><div class="st-num" id="dash-badges">0</div><div class="st-lab">Badges</div></div>
+      </div>
+
+      <div class="dash-row">
+        <div class="dash-card daily-goal">
+          <h3>🎯 Today's Goal</h3>
+          <div class="goal-bar"><div id="dash-goal-bar" class="goal-fill" style="width:0%"></div></div>
+          <p id="dash-goal-text">0 / 50 XP today</p>
+          <button class="hero-cta secondary" onclick="showTab('english')">Earn XP →</button>
+        </div>
+        <div class="dash-card quick-actions">
+          <h3>⚡ Quick Start</h3>
+          <div class="qa-grid">
+            <button onclick="showTab('chat')" class="qa-btn" style="--c1:#7C3AED;--c2:#4F46E5;"><span>🤖</span>Ask Buddy</button>
+            <button onclick="showTab('english')" class="qa-btn" style="--c1:#10B981;--c2:#059669;"><span>📚</span>Learn English</button>
+            <button onclick="showTab('brain')" class="qa-btn" style="--c1:#F59E0B;--c2:#D97706;"><span>🧩</span>Brain Games</button>
+            <button onclick="showTab('idea')" class="qa-btn" style="--c1:#EC4899;--c2:#DB2777;"><span>💡</span>Idea Lab</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!--  TAB 1: AI MENTOR CHAT (INTERACTIVE)                  -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="panel-chat" class="tab-panel" role="tabpanel">
+      <div class="section-header">
+        <h2>🤖 Chat with Buddy</h2>
+        <p>Ask anything! Buddy loves answering questions! 💭</p>
+      </div>
+
+      <div class="card">
+        <!-- Chat Window -->
+        <div id="chat-window" class="chat-window" aria-live="polite">
+          <div class="chat-bubble bot">
+            <div class="bubble-name">🤖 Buddy</div>
+            Hi <span id="chat-name">Friend</span>! I'm Buddy, your AI friend! 🌟
+            Ask me ANYTHING — science, history, jokes, or your crazy questions!
+            <div style="margin-top:8px; font-size:0.85rem; opacity:0.8;">Tap the 🎤 button to talk with your voice! (Or type below)</div>
+          </div>
+        </div>
+
+        <!-- Voice + Text Input -->
+        <div class="chat-input-row">
+          <button id="voice-btn" onclick="toggleVoiceInput()" style="padding:12px 16px; background:#3B82F6; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:700; font-size:1.2rem; width:50px;">🎤</button>
+          <input
+            id="chat-input"
+            class="form-input"
+            type="text"
+            placeholder="Type or use voice 🎤..."
+            autocomplete="off"
+          />
+          <button id="chat-send-btn" class="btn btn-primary" onclick="sendChat()" style="padding:12px; font-weight:900;">
+            🚀
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!--  TAB 2: ENGLISH — DUOLINGO-STYLE LEARNING PATH        -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="panel-english" class="tab-panel" role="tabpanel">
+      <div class="english-header">
+        <div>
+          <h2>📚 Learn English</h2>
+          <p>Pick a section, climb the path, learn step-by-step. ✨</p>
+        </div>
+        <div class="english-stats">
+          <div class="es-pill green"><span>💚</span><span id="english-xp">0</span> XP</div>
+          <div class="es-pill amber"><span>🔥</span><span id="dash-streak-mirror">0</span></div>
+        </div>
+      </div>
+
+      <div class="eng-subtabs" role="tablist">
+        <button class="eng-subtab active" data-cat="grammar" onclick="setEnglishCategory('grammar')">
+          <span class="est-ico">📖</span><span class="est-txt">Grammar</span>
+          <span class="est-sub">Rules &amp; parts of speech</span>
+        </button>
+        <button class="eng-subtab" data-cat="spoken" onclick="setEnglishCategory('spoken')">
+          <span class="est-ico">🗣️</span><span class="est-txt">Spoken</span>
+          <span class="est-sub">Talk like a pro</span>
+        </button>
+        <button class="eng-subtab" data-cat="writing" onclick="setEnglishCategory('writing')">
+          <span class="est-ico">✍️</span><span class="est-txt">Writing</span>
+          <span class="est-sub">Stories &amp; paragraphs</span>
+        </button>
+      </div>
+
+      <div id="english-path" class="english-path-wrap"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!--  TAB 2b: FIX MY WRITING (CORRECTION + LEVEL MISSIONS) -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="panel-writing" class="tab-panel" role="tabpanel">
+      <div class="section-header">
+        <h2>📝 Fix My Writing</h2>
+        <p>Type any sentence — we will fix it and make it cooler! 🚀</p>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <h3 style="font-weight:900; margin-bottom:8px; color:#4C1D95;">🎯 Choose Your Level</h3>
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:12px;">
+          <div style="font-weight:800; color:#1E1B4B;">Level: <span id="english-level-status">BASIC</span></div>
+          <div style="font-weight:800; color:#047857;">XP: <span id="english-xp-w">0</span></div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px;">
+          <button type="button" class="english-level-btn" data-level="basic" onclick="setEnglishLevel('basic')" style="padding:10px; border:none; border-radius:10px; background:#DBEAFE; color:#1D4ED8; font-weight:800; cursor:pointer;">Basic</button>
+          <button type="button" class="english-level-btn" data-level="intermediate" onclick="setEnglishLevel('intermediate')" style="padding:10px; border:none; border-radius:10px; background:#FEF3C7; color:#B45309; font-weight:800; cursor:pointer;">Intermediate</button>
+          <button type="button" class="english-level-btn" data-level="advanced" onclick="setEnglishLevel('advanced')" style="padding:10px; border:none; border-radius:10px; background:#FCE7F3; color:#BE185D; font-weight:800; cursor:pointer;">Advanced</button>
+        </div>
+        <button type="button" onclick="startEnglishMission()" style="margin-top:10px; width:100%; padding:10px; border:none; border-radius:10px; background:linear-gradient(135deg,#10B981,#059669); color:white; font-weight:900; cursor:pointer;">🎯 Start Level Mission</button>
+      </div>
+
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label" for="english-input">💭 Type or edit your mission sentence:</label>
+          <textarea
+            id="english-input"
+            class="form-textarea"
+            placeholder="Type anything! We will teach from basics to advanced 😄"
+            rows="3"
+          ></textarea>
+        </div>
+        <button id="english-btn" class="btn btn-primary btn-full" onclick="correctEnglish()" style="font-size:1.1rem; padding:14px; font-weight:900;">
+          ✨ MAKE IT AWESOME!
+        </button>
+      </div>
+
+      <!-- Results -->
+      <div id="english-result" class="result-area">
+        <div id="english-error" class="alert alert-error" style="display:none; margin-bottom:12px;"></div>
+
+        <div class="result-block success">
+          <div class="result-label">✅ PERFECT Version</div>
+          <div class="result-value" id="english-corrected" style="font-size:1.1rem; font-weight:700; color:#059669;">—</div>
+        </div>
+
+        <div class="result-block warning">
+          <div class="result-label">🔍 What We Fixed</div>
+          <div class="result-value" id="english-mistake">—</div>
+        </div>
+
+        <div class="result-block info">
+          <div class="result-label">⭐ Even COOLER Version</div>
+          <div class="result-value" id="english-better">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!--  TAB 3: SUBJECT EXPLORER (INTERACTIVE LEARNING)       -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="panel-learn" class="tab-panel" role="tabpanel">
+      <div class="section-header">
+        <h2>📚 Learning Quest!</h2>
+        <p>Choose a topic and become an EXPERT in 2 minutes! 🧠</p>
+      </div>
+
+      <!-- Quick Topic Buttons -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-bottom:20px;">
+        <button onclick="quickLearn('dinosaurs')" style="padding:10px; background:#10B981; color:white; border:none; border-radius:10px; font-weight:700; cursor:pointer;">🦕 Dinosaurs</button>
+        <button onclick="quickLearn('space')" style="padding:10px; background:#3B82F6; color:white; border:none; border-radius:10px; font-weight:700; cursor:pointer;">🚀 Space</button>
+        <button onclick="quickLearn('ocean')" style="padding:10px; background:#06B6D4; color:white; border:none; border-radius:10px; font-weight:700; cursor:pointer;">🐚 Ocean</button>
+        <button onclick="quickLearn('animals')" style="padding:10px; background:#F59E0B; color:white; border:none; border-radius:10px; font-weight:700; cursor:pointer;">🦁 Animals</button>
+      </div>
+
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label" for="learn-input">🔬 Or ask about ANY topic:</label>
+          <input
+            id="learn-input"
+            class="form-input"
+            type="text"
+            placeholder="e.g. How do airplanes fly? What is electricity?"
+            style="font-size:1rem;"
+          />
+        </div>
+        <button id="learn-btn" class="btn btn-primary btn-full" onclick="explainTopic()" style="font-size:1.1rem; padding:14px; font-weight:900;">
+          🎯 LEARN NOW!
+        </button>
+      </div>
+
+      <!-- Results -->
+      <div id="learn-result" class="result-area">
+        <div id="learn-error" class="alert alert-error" style="display:none; margin-bottom:12px;"></div>
+
+        <div class="result-block">
+          <div class="result-label">📖 Simple Explanation</div>
+          <div class="result-value" id="learn-explanation" style="font-size:1.05rem; line-height:1.8;">—</div>
+        </div>
+
+        <div class="result-block info">
+          <div class="result-label">🌟 Real-Life Example</div>
+          <div class="result-value" id="learn-example" style="font-size:1rem;">—</div>
+        </div>
+
+        <div class="result-block warning">
+          <div class="result-label">🤔 Quick Quiz (Test Yourself!)</div>
+          <div class="result-value" id="learn-quiz" style="font-size:1rem; font-weight:700;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!--  TAB 4: IDEA LAB (CREATIVE MODE)                      -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="panel-idea" class="tab-panel" role="tabpanel">
+      <div class="section-header">
+        <h2>💡 AI Assembly · Idea Lab</h2>
+        <p>Type any idea — get a real engineer's blueprint with components, references &amp; cost.</p>
+      </div>
+
+      <!-- Quick prompts -->
+      <div class="idea-quickgrid">
+        <button type="button" class="idea-quick q1" onclick="quickIdea('robot dog like Boston Dynamics Spot')">
+          <span class="iq-emoji">🤖</span><span class="iq-label">Robot Dog</span>
+        </button>
+        <button type="button" class="idea-quick q2" onclick="quickIdea('eVTOL flying car')">
+          <span class="iq-emoji">🚗</span><span class="iq-label">Flying Car</span>
+        </button>
+        <button type="button" class="idea-quick q3" onclick="quickIdea('multiplayer 2D video game')">
+          <span class="iq-emoji">🎮</span><span class="iq-label">Video Game</span>
+        </button>
+        <button type="button" class="idea-quick q4" onclick="quickIdea('smart home plant watering system')">
+          <span class="iq-emoji">🌱</span><span class="iq-label">Plant Bot</span>
+        </button>
+        <button type="button" class="idea-quick q5" onclick="quickIdea('AI study assistant')">
+          <span class="iq-emoji">🧠</span><span class="iq-label">AI Tutor</span>
+        </button>
+        <button type="button" class="idea-quick q6" onclick="quickIdea('voice-controlled drone')">
+          <span class="iq-emoji">🛸</span><span class="iq-label">Drone</span>
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label" for="idea-input">🌈 What do you want to build?</label>
+          <textarea
+            id="idea-input"
+            class="form-textarea"
+            placeholder="e.g. A robot that waters my plants when I'm away. Or a wearable that tracks my heart rate..."
+            rows="3"
+          ></textarea>
+        </div>
+        <button id="idea-btn" class="btn btn-primary btn-full idea-cta" onclick="generateIdea()">
+          🚀 BUILD MY BLUEPRINT
+        </button>
+      </div>
+
+      <!-- Results -->
+      <div id="idea-result" class="result-area">
+        <div id="idea-error" class="alert alert-error" style="display:none; margin-bottom:12px;"></div>
+        <div id="idea-blueprint" class="idea-blueprint"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!--  TAB 5: BRAIN GAMES                                   -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="panel-brain" class="tab-panel" role="tabpanel">
+      <div class="section-header">
+        <h2>🧩 Brain Boost Arena</h2>
+        <p>Puzzles, quizzes, math sprints, scrambles & memory match!</p>
+      </div>
+
+      <div class="brain-grid">
+        <div class="game-card g-purple">
+          <h3>🕵️ Riddle</h3>
+          <p id="puzzle-question" class="game-q">Loading...</p>
+          <div class="game-row">
+            <input id="puzzle-answer" class="form-input" type="text" placeholder="Your answer" />
+            <button onclick="checkPuzzle()" class="game-btn blue">Check</button>
+            <button onclick="nextPuzzle()" class="game-btn indigo">Skip</button>
+          </div>
+          <p id="puzzle-result" class="game-out"></p>
+        </div>
+
+        <div class="game-card g-blue">
+          <h3>📚 Quiz</h3>
+          <p id="quiz-question" class="game-q">Loading...</p>
+          <div id="quiz-options" class="quiz-opts"></div>
+          <button onclick="nextQuiz()" class="game-btn amber" style="margin-top:8px;">Next Quiz</button>
+          <p id="quiz-result" class="game-out"></p>
+        </div>
+
+        <div class="game-card g-orange">
+          <h3>⚡ Math Sprint</h3>
+          <p id="math-question" class="game-q big">Press Start</p>
+          <div class="game-row">
+            <input id="math-answer" class="form-input" type="number" placeholder="Answer" onkeydown="if(event.key==='Enter')submitMath()" />
+            <button onclick="submitMath()" class="game-btn green">Go</button>
+            <button onclick="startMathSprint()" class="game-btn orange">Start 30s</button>
+          </div>
+          <p class="game-out">Score: <strong id="math-score">0</strong> · Time: <strong id="math-time">0</strong>s</p>
+        </div>
+
+        <div class="game-card g-pink">
+          <h3>🔤 Word Scramble</h3>
+          <p id="scramble-word" class="game-q big">— — —</p>
+          <div class="game-row">
+            <input id="scramble-input" class="form-input" type="text" placeholder="Unscramble" onkeydown="if(event.key==='Enter')checkScramble()" />
+            <button onclick="checkScramble()" class="game-btn pink">Check</button>
+            <button onclick="newScramble()" class="game-btn indigo">New</button>
+          </div>
+          <p id="scramble-result" class="game-out"></p>
+        </div>
+
+        <div class="game-card g-teal" style="grid-column:1/-1;">
+          <h3>🃏 Memory Match</h3>
+          <p class="game-out" style="margin-bottom:8px;">Moves: <strong id="memory-moves">0</strong> · Match all pairs!</p>
+          <div id="memory-grid" class="memory-grid"></div>
+          <button onclick="startMemoryGame()" class="game-btn teal" style="margin-top:10px;">🔀 Shuffle & Start</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!--  TAB 6: MY BADGES & PROGRESS                          -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="panel-progress" class="tab-panel" role="tabpanel">
+      <div class="section-header">
+        <h2>🏆 MY ACHIEVEMENTS</h2>
+        <p>Your learning adventure so far!</p>
+      </div>
+
+      <!-- Points Overview -->
+      <div class="card" style="text-align:center; background:linear-gradient(135deg, #7C3AED, #4F46E5); color:white; padding:32px;">
+        <div style="font-size:3rem; margin-bottom:8px;">⭐</div>
+        <div style="font-size:2.5rem; font-weight:900;" id="total-points">0</div>
+        <div style="font-size:1rem; opacity:0.9; margin-top:8px;">Total Points Earned!</div>
+        <div style="font-size:0.9rem; opacity:0.8; margin-top:4px; display:flex; align-items:center; justify-content:center; gap:4px;">
+          <span>🔥 Streak: </span><span id="streak-count" style="font-weight:900;">0</span>
+        </div>
+      </div>
+
+      <!-- Badges Section -->
+      <div style="margin-top:24px;">
+        <h3 style="font-weight:900; margin-bottom:16px;">🏅 Badges Unlocked:</h3>
+        <div id="badges-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:12px;">
+          <div style="text-align:center; padding:16px; background:var(--bg); border-radius:12px; border:2px solid var(--border);">
+            <div style="font-size:2rem; margin-bottom:4px;">🌟</div>
+            <div style="font-weight:700; color:var(--text-light);">First Step</div>
+            <div style="font-size:0.8rem; color:var(--text-light);">Start learning</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Progress Data -->
+      <div id="progress-content" style="margin-top:24px;">
+        <!-- Loaded dynamically -->
+      </div>
+    </div>
+
+  </main><!-- end main-content -->
+  </div><!-- end app-layout -->
+
+  <!-- ── Lesson Player (Multi-stage interactive tutorial) ───── -->
+  <div id="lesson-modal" class="lesson-player" onclick="if(event.target===this)closeLessonModal()">
+    <div class="lesson-player-card">
+      <!-- Progress bar -->
+      <div class="lp-topbar">
+        <button class="lp-close" onclick="closeLessonModal()" aria-label="Close">✕</button>
+        <div class="lp-progress"><div id="lp-progress-fill" class="lp-progress-fill"></div></div>
+        <div id="lp-step-counter" class="lp-step-counter">1 / 7</div>
+      </div>
+
+      <h2 id="lesson-modal-title" class="lp-title">Lesson</h2>
+
+      <!-- Stage container -->
+      <div id="lp-stages" class="lp-stages">
+        <!-- Stages injected by JS -->
+        <div class="lp-loading">🦉 Buddy is preparing your lesson...</div>
+      </div>
+
+      <!-- Bottom navigation -->
+      <div class="lp-footer">
+        <button id="lp-prev" class="lp-nav-btn ghost" onclick="lpPrev()">◀ Back</button>
+        <div id="lp-stage-dots" class="lp-stage-dots"></div>
+        <button id="lp-next" class="lp-nav-btn primary" onclick="lpNext()">Next ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ──────────────────────────────────────────────── -->
+  <footer style="text-align:center; padding:16px; color:#9CA3AF; font-size:0.8rem; font-weight:600;">
+    ⚙️ AI Assembly — Build. Learn. Ship. 🚀 &nbsp;|&nbsp;
+    <a href="/docs" target="_blank" style="color:var(--primary); text-decoration:none;">API Docs</a>
+  </footer>
+
+</div><!-- end app-shell -->
+
+<script src="/static/app.js"></script>
+</body>
+</html>
