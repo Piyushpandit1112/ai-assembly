@@ -5,7 +5,7 @@
  * Audio, animations, games, rewards!
  */
 
-const API = 'http://localhost:8000';
+const API = window.location.origin;
 
 // ── Audio Context for Sound Effects ────────────────────────────
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
