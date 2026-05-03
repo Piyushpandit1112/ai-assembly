@@ -157,6 +157,8 @@
       <div class="sidebar-section-title">MAIN</div>
       <button id="side-dashboard" class="sidebar-item" onclick="showTab('dashboard')"><span class="sb-ico">🏠</span><span>Dashboard</span></button>
       <button id="side-chat"      class="sidebar-item" onclick="showTab('chat')"><span class="sb-ico">🤖</span><span>Buddy AI</span></button>
+        <button id="side-talk"      class="sidebar-item" onclick="showTab('talk')"><span class="sb-ico">🎙️</span><span>Talk Mode</span></button>
+        <button id="side-photo"     class="sidebar-item" onclick="showTab('photo')"><span class="sb-ico">📷</span><span>Photo Help</span></button>
 
       <div class="sidebar-section-title">LEARN</div>
       <button id="side-english"   class="sidebar-item" onclick="showTab('english')"><span class="sb-ico">📚</span><span>Learn English</span></button>
@@ -258,6 +260,76 @@
             🚀
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!--  TAB 1B: TALK MODE — Voice conversation with timer    -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="panel-talk" class="tab-panel" role="tabpanel">
+      <div class="section-header">
+        <h2>🎙️ Talk Mode</h2>
+        <p>Have a real spoken chat with Buddy. Tap the mic and start talking!</p>
+      </div>
+
+      <div class="card talk-card">
+        <div class="talk-controls">
+          <label class="talk-label" for="talk-duration">Session length:</label>
+          <select id="talk-duration" class="form-input talk-select">
+            <option value="5">5 min</option>
+            <option value="10">10 min</option>
+            <option value="15">15 min</option>
+            <option value="30" selected>30 min</option>
+            <option value="60">60 min</option>
+          </select>
+          <button id="talk-start-btn" class="btn btn-primary" onclick="startTalkSession()">▶ Start chatting</button>
+          <button id="talk-end-btn" class="btn" style="display:none;" onclick="endTalkSession()">⏹ End</button>
+          <span id="talk-timer" class="talk-timer">--:--</span>
+          <span id="talk-status" class="talk-status">Idle</span>
+        </div>
+
+        <div id="talk-mic-stage" class="talk-mic-stage" style="display:none;">
+          <button id="talk-mic-btn" class="talk-mic-btn" onclick="toggleTalkMic()" title="Press to talk">🎤</button>
+          <div class="talk-mic-hint" id="talk-mic-hint">Tap and speak. Tap again when you're done.</div>
+        </div>
+
+        <div class="talk-transcript-wrap">
+          <div class="talk-transcript-head">
+            <strong>📜 Live Transcript</strong>
+            <button class="btn-link" onclick="copyTalkTranscript()">📋 Copy</button>
+            <button class="btn-link" onclick="downloadTalkTranscript()">💾 Download</button>
+          </div>
+          <div id="talk-transcript" class="talk-transcript" aria-live="polite">
+            <div class="talk-empty">Press <b>Start chatting</b> to begin. Buddy will greet you and you can take it from there!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!--  TAB 1C: PHOTO HELP — Upload a question image         -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="panel-photo" class="tab-panel" role="tabpanel">
+      <div class="section-header">
+        <h2>📷 Photo Help</h2>
+        <p>Stuck on a homework question? Snap a photo and Buddy will explain it step-by-step.</p>
+      </div>
+
+      <div class="card photo-card">
+        <div class="photo-drop" id="photo-drop">
+          <input type="file" id="photo-file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="onPhotoChosen(event)" />
+          <button class="btn btn-primary" onclick="document.getElementById('photo-file').click()">📤 Choose photo</button>
+          <p class="photo-hint">Or drag &amp; drop an image here · max 8 MB · JPG / PNG / WEBP</p>
+          <img id="photo-preview" class="photo-preview" alt="" style="display:none" />
+        </div>
+
+        <div class="photo-question-row">
+          <input id="photo-question" class="form-input" type="text" maxlength="240"
+            placeholder="Optional: describe what part you need help with..." />
+          <button id="photo-solve-btn" class="btn btn-primary" onclick="solvePhoto()" disabled>✨ Explain it</button>
+        </div>
+
+        <div id="photo-result" class="photo-result" style="display:none"></div>
       </div>
     </div>
 
