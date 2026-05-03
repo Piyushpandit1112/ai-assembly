@@ -10,11 +10,24 @@
 | Tab | What it does |
 |---|---|
 | 🧠 **Buddy Chat** | Friendly AI mentor that explains concepts at a kid's level |
+| 🎙️ **Talk Mode** | Real spoken conversation with Buddy (5–60 min). Live transcript of you + AI, copy/download. Uses browser speech recognition + speech synthesis. |
+| 📷 **Photo Help** | Upload a homework photo. Buddy reads it and gives a step-by-step kid-friendly explanation. If the image is blurry, it asks for a clearer one instead of guessing. |
 | 📚 **English** | Three sub-tabs (Grammar, Spoken, Writing) with a multi-stage interactive lesson player — narration, animations, quizzes, mic, writing check |
 | 📖 **Learn** | AI subject explainer (dinosaurs, space, ocean, …) |
 | 💡 **Idea Lab** | Realistic engineering blueprint with components, real-world examples, cost / time estimates and reference URLs |
 | 🎮 **Brain Games** | Math sprint, memory match, word scramble, riddles, quiz |
 | 📊 **Progress** | XP, streak, badges, hearts — per-user namespaced storage |
+
+### 🎯 Smart by default
+- **Age-adaptive** — pick your age once and every prompt (chat, English, Topics, Idea Lab, Talk, Photo Help) is automatically tuned to that vocab + complexity level (≤7, ≤10, ≤13, ≤16, adult).
+- **Anti-repeat** — every quiz, lesson, correction and explanation is freshly varied per user and per visit (timestamp + nonce + rotating analogy flavour). Two students will not see the same questions back-to-back.
+- **No-hallucination Photo Help** — when the image is unreadable the model is forced to reply `need_clearer_image` with a tip instead of inventing an answer.
+
+### 🆕 New endpoints
+| Method | Path | What it does |
+|---|---|---|
+| `POST` | `/ai/talk` | Multi-turn voice chat. Body: `{message, history[], username, age, language, is_first_turn}` |
+| `POST` | `/ai/vision` | `multipart/form-data` with `file` (jpg/png/webp ≤ 8 MB), optional `question`, `username`, `age`, `language`. Returns structured JSON. |
 
 ---
 
