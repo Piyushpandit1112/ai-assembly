@@ -1,4 +1,4 @@
-﻿/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    KidLearn AI â€” Main Stylesheet
    Child-friendly, bright, modern design
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
@@ -2023,5 +2023,160 @@ img, video { max-width: 100%; height: auto; }
 .lp-yt-player iframe { width: 100%; height: 100%; border: 0; }
 @media (max-width: 480px) {
   .lp-yt-grid { grid-template-columns: 1fr; }
+}
+
+/* Talk mode */
+.talk-card { padding: 18px; }
+.talk-controls {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  margin-bottom: 14px;
+}
+.talk-label { font-weight: 700; color: #334155; }
+.talk-select { max-width: 130px; }
+.talk-timer {
+  font-family: 'Courier New', monospace; font-weight: 900; font-size: 1.2rem;
+  background: #0f172a; color: #facc15; padding: 6px 12px; border-radius: 8px;
+  min-width: 80px; text-align: center;
+}
+.talk-status { color: #64748b; font-style: italic; flex: 1; min-width: 200px; }
+.talk-mic-stage {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 22px 0; border-top: 1px dashed #e2e8f0; border-bottom: 1px dashed #e2e8f0;
+  margin-bottom: 14px;
+}
+.talk-mic-btn {
+  width: 96px; height: 96px; border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: #fff; border: none; cursor: pointer;
+  font-size: 2.4rem; box-shadow: 0 8px 24px rgba(59,130,246,.35);
+  transition: transform .15s ease;
+}
+.talk-mic-btn:hover { transform: scale(1.05); }
+.talk-mic-btn.listening {
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  animation: talk-pulse 1.2s ease-in-out infinite;
+}
+@keyframes talk-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,.6); }
+  50%      { box-shadow: 0 0 0 18px rgba(239,68,68,0); }
+}
+.talk-mic-hint { color: #64748b; font-size: .9rem; }
+.talk-transcript-wrap { margin-top: 8px; }
+.talk-transcript-head {
+  display: flex; gap: 8px; align-items: center; margin-bottom: 6px;
+}
+.talk-transcript-head strong { flex: 1; }
+.btn-link {
+  background: none; border: none; color: #3b82f6; cursor: pointer;
+  font-weight: 700; font-size: .9rem;
+}
+.btn-link:hover { text-decoration: underline; }
+.talk-transcript {
+  max-height: 360px; overflow-y: auto; background: #f8fafc;
+  border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.talk-empty { color: #94a3b8; text-align: center; padding: 20px; }
+.talk-bubble {
+  max-width: 85%; padding: 10px 14px; border-radius: 14px; line-height: 1.45;
+}
+.talk-bubble .talk-who { font-size: .8rem; font-weight: 800; opacity: .8; margin-bottom: 4px; }
+.talk-user { background: #dbeafe; color: #1e3a8a; align-self: flex-end; border-bottom-right-radius: 4px; }
+.talk-assistant { background: #ede9fe; color: #4c1d95; align-self: flex-start; border-bottom-left-radius: 4px; }
+
+/* Photo help */
+.photo-card { padding: 18px; }
+.photo-drop {
+  border: 2px dashed #cbd5e1; border-radius: 14px; background: #f8fafc;
+  padding: 24px; text-align: center; margin-bottom: 14px;
+}
+.photo-hint { color: #64748b; font-size: .9rem; margin-top: 8px; }
+.photo-preview {
+  max-width: 100%; max-height: 320px; margin-top: 12px;
+  border-radius: 10px; border: 1px solid #e2e8f0;
+}
+.photo-question-row {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.photo-question-row .form-input { flex: 1; min-width: 220px; }
+.photo-result { margin-top: 8px; }
+.photo-loading { color: #64748b; font-style: italic; padding: 12px; }
+.photo-card-result {
+  background: #ecfeff; border: 1px solid #a5f3fc; border-radius: 14px;
+  padding: 16px; line-height: 1.55; color: #0f172a;
+}
+.photo-card-result.warn {
+  background: #fff7ed; border-color: #fdba74; color: #7c2d12;
+}
+.photo-card-result h3 { margin: 0 0 8px; color: #0e7490; }
+.photo-card-result.warn h3 { color: #9a3412; }
+.photo-see { color: #475569; font-size: .95rem; }
+.photo-answer {
+  background: #fff; border-radius: 10px; padding: 10px 12px;
+  margin: 10px 0; font-weight: 700; border-left: 4px solid #10b981;
+}
+.photo-steps { padding-left: 22px; margin: 10px 0; }
+.photo-steps li { margin-bottom: 6px; }
+.photo-key { background: #fef9c3; padding: 8px 12px; border-radius: 8px; }
+.photo-cheer { color: #047857; font-weight: 700; margin-top: 8px; }
+
+@media (max-width: 860px) {
+  .sidebar-toggle {
+    top: 14px;
+    left: 14px;
+    z-index: 1200;
+  }
+
+  .app-sidebar,
+  #app-sidebar {
+    position: fixed;
+    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    padding: 72px 16px 24px;
+    border-right: none;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1100;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: none;
+  }
+
+  body.sidebar-open,
+  html.sidebar-open {
+    overflow: hidden;
+  }
+
+  body.sidebar-open .app-sidebar,
+  body.sidebar-open #app-sidebar {
+    transform: translateX(0);
+  }
+
+  .talk-controls { gap: 8px; }
+  .talk-status { width: 100%; flex: 1 1 100%; }
+  .talk-mic-btn { width: 84px; height: 84px; font-size: 2rem; }
+  .talk-transcript { max-height: 300px; }
+  .talk-bubble { max-width: 92%; }
+  .photo-question-row { flex-direction: column; }
+  .photo-question-row .form-input,
+  .photo-question-row .btn { width: 100%; }
+  .photo-preview { max-height: 240px; }
+}
+
+@media (max-width: 640px) {
+  .talk-controls { flex-direction: column; align-items: stretch; }
+  .talk-controls .btn,
+  .talk-controls .talk-select { width: 100%; max-width: 100%; }
+  .talk-timer { align-self: center; }
+  .talk-status { text-align: center; }
+  .talk-mic-btn { width: 76px; height: 76px; font-size: 1.8rem; }
+  .talk-transcript { max-height: 260px; }
+  .photo-drop { padding: 18px 12px; }
+  .photo-card-result { padding: 14px; border-radius: 12px; }
 }
 
