@@ -127,6 +127,128 @@ async def call_ai(system_prompt: str, user_message: str) -> str:
             + ". Please check your API keys in `.env` or try again later.")
 
 
+# ── Conversation chat (Talk Mode) ───────────────────────────────
+async def call_chat(messages: list[dict]) -> str:
+    """
+    Like call_ai but accepts a full message history (system + alternating
+    user/assistant turns). Used by Talk Mode for multi-turn conversation.
+    """
+    if settings.AI_PROVIDER == "ollama":
+        try:
+            return await _ollama_chat_history(messages)
+        except Exception as e:
+            return f"⚠️ Ollama error: {e}"
+
+    chain = settings.llm_chain
+    if not chain:
+        return "⚠️ No LLM API key configured."
+
+    errors = []
+    for provider in chain:
+        try:
+            return await _provider_chat(provider, messages, provider["model"])
+        except Exception as e:
+            log.warning("Talk provider %s failed: %s", provider["name"], e)
+            errors.append(f"{provider['name']}: {type(e).__name__}")
+            continue
+    return "⚠️ All AI providers failed: " + "; ".join(errors)
+
+
+# ── Vision (Photo Help) ─────────────────────────────────────────
+async def call_vision(image_b64: str, mime: str, user_text: str,
+                      system_prompt: str) -> str:
+    """
+    Call a vision-capable LLM. Tries Groq first, then OpenRouter.
+    image_b64: raw base64 (no data: prefix).
+    """
+    image_url = f"data:{mime};base64,{image_b64}"
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": [
+            {"type": "text", "text": user_text or "Please help me understand this question."},
+            {"type": "image_url", "image_url": {"url": image_url}},
+        ]},
+    ]
+
+    vision_providers = []
+    if settings.GROQ_API_KEY:
+        vision_providers.append({
+            "name": "Groq-Vision",
+            "base_url": "https://api.groq.com/openai/v1",
+            "api_key": settings.GROQ_API_KEY,
+            "model": settings.VISION_MODEL,
+        })
+        if settings.VISION_FALLBACK_MODEL and settings.VISION_FALLBACK_MODEL != settings.VISION_MODEL:
+            vision_providers.append({
+                "name": "Groq-Vision-Fallback",
+                "base_url": "https://api.groq.com/openai/v1",
+                "api_key": settings.GROQ_API_KEY,
+                "model": settings.VISION_FALLBACK_MODEL,
+            })
+    if settings.OPENROUTER_API_KEY:
+        vision_providers.append({
+            "name": "OpenRouter-Vision",
+            "base_url": "https://openrouter.ai/api/v1",
+            "api_key": settings.OPENROUTER_API_KEY,
+            "model": "meta-llama/llama-3.2-11b-vision-instruct:free",
+        })
+
+    if not vision_providers:
+        return ('{"need_clearer_image": false, "subject": "general", '
+                '"what_i_see": "Vision is not configured.", '
+                '"answer": "Please add a Groq or OpenRouter API key.", '
+                '"explanation_steps": ["Set GROQ_API_KEY in your .env or Render env vars."], '
+                '"key_concept": "API key needed for image understanding.", '
+                '"encouragement": "Almost there!"}')
+
+    errors = []
+    for p in vision_providers:
+        try:
+            return await _provider_chat(p, messages, p["model"])
+        except Exception as e:
+            log.warning("Vision provider %s failed: %s", p["name"], e)
+            errors.append(f"{p['name']}: {type(e).__name__}")
+            continue
+    return ('{"need_clearer_image": true, "reason": "I could not understand the photo right now.", '
+            '"tip": "Please try again with a clear, well-lit picture and good focus."}')
+
+
+async def _provider_chat(provider: dict, messages: list[dict], model: str) -> str:
+    """OpenAI-compatible chat completion with custom message list (supports vision)."""
+    payload = {
+        "model": model,
+        "messages": messages,
+        "stream": False,
+        "temperature": 0.7,
+        "max_tokens": 1024,
+    }
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {provider['api_key']}",
+    }
+    async with httpx.AsyncClient(timeout=90.0) as client:
+        r = await client.post(
+            f"{provider['base_url']}/chat/completions",
+            json=payload,
+            headers=headers,
+        )
+        r.raise_for_status()
+        return r.json()["choices"][0]["message"]["content"]
+
+
+async def _ollama_chat_history(messages: list[dict]) -> str:
+    payload = {"model": settings.OLLAMA_MODEL, "messages": messages,
+               "stream": False, "temperature": 0.7}
+    async with httpx.AsyncClient(timeout=120.0) as client:
+        r = await client.post(
+            f"{settings.OLLAMA_BASE_URL}/chat/completions",
+            json=payload,
+            headers={"Authorization": "Bearer ollama"},
+        )
+        r.raise_for_status()
+        return r.json()["choices"][0]["message"]["content"]
+
+
 def parse_json_response(raw: str) -> dict | None:
     """
     Try to extract a JSON object from the AI's response text.
