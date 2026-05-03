@@ -341,6 +341,7 @@ function showTab(tabId) {
 
   // close mobile sidebar after tab change
   document.body.classList.remove('sidebar-open');
+  document.documentElement.classList.remove('sidebar-open');
 }
 
 // ── Helper: Set loading state on a button ──────────────────────
@@ -434,6 +435,7 @@ async function sendChat() {
         message,
         username: state.username,
         language: state.language,
+        age: state.age || 10,
       }),
     });
     const data = await res.json();
@@ -465,6 +467,7 @@ async function correctEnglish() {
         sentence,
         username: state.username,
         language: state.language,
+        age: state.age || 10,
       }),
     });
     const data = await res.json();
@@ -545,6 +548,7 @@ async function generateIdea() {
         idea,
         username: state.username,
         language: state.language,
+        age: state.age || 14,
       }),
     });
     if (!res.ok) throw new Error('idea_failed');
@@ -920,6 +924,7 @@ async function loadEnglishLesson(topic = 'articles') {
         topic,
         level: state.englishLevel,
         language: state.language,
+        age: state.age || 10,
       }),
     });
     clearTimeout(timeout);
@@ -1024,6 +1029,7 @@ async function checkWritingPractice() {
         sentence: writingText,
         username: state.username,
         language: state.language,
+        age: state.age || 10,
       }),
     });
     const data = await res.json();
@@ -1339,7 +1345,7 @@ async function loadLessonData(topic) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
-      body: JSON.stringify({ topic, level: state.englishLevel, language: state.language }),
+      body: JSON.stringify({ topic, level: state.englishLevel, language: state.language, age: state.age || 10 }),
     });
     clearTimeout(timeout);
     if (!res.ok) throw new Error('lesson_failed');
@@ -1744,7 +1750,7 @@ async function lpCheckWriting() {
     const res = await fetch(`${API}/english/correct`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, level: state.englishLevel }),
+      body: JSON.stringify({ sentence: text, level: state.englishLevel, age: state.age || 10 }),
     });
     const data = await res.json();
     fb.innerHTML = `<div class="lp-correction"><b>Corrected:</b> ${escapeHtml(data.corrected || text)}</div>
@@ -1974,7 +1980,316 @@ function languageToVoiceCode() { return 'en-US'; }
 
 // Sidebar toggle for mobile
 function toggleSidebar() {
-  document.body.classList.toggle('sidebar-open');
+  const open = !document.body.classList.contains('sidebar-open');
+  document.body.classList.toggle('sidebar-open', open);
+  document.documentElement.classList.toggle('sidebar-open', open);
+}
+
+// ═════════════════════════════════════════════════════════════
+// TALK MODE — live voice chat with timer + transcript
+// ═════════════════════════════════════════════════════════════
+const talkState = {
+  active: false,
+  endsAt: 0,
+  tickHandle: null,
+  recognizer: null,
+  listening: false,
+  history: [],
+  pendingUser: '',
+  speaking: false,
+  isFirstTurn: true,
+};
+
+function _talkEl(id) { return document.getElementById(id); }
+
+function _appendTalkBubble(role, text) {
+  const wrap = _talkEl('talk-transcript');
+  if (!wrap) return;
+  const empty = wrap.querySelector('.talk-empty');
+  if (empty) empty.remove();
+  const div = document.createElement('div');
+  div.className = `talk-bubble talk-${role}`;
+  const who = role === 'user' ? (state.username || 'You') : 'Buddy';
+  div.innerHTML = `<div class="talk-who">${role === 'user' ? '🧑' : '🤖'} ${escapeHtml(who)}</div><div class="talk-msg">${escapeHtml(text)}</div>`;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function _talkSetStatus(msg) {
+  const el = _talkEl('talk-status');
+  if (el) el.textContent = msg;
+}
+
+function _talkUpdateTimer() {
+  const el = _talkEl('talk-timer');
+  if (!el) return;
+  const remaining = Math.max(0, talkState.endsAt - Date.now());
+  const m = Math.floor(remaining / 60000);
+  const s = Math.floor((remaining % 60000) / 1000);
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if (remaining <= 0 && talkState.active) endTalkSession(true);
+}
+
+function _talkSpeak(text, onDone) {
+  if (!('speechSynthesis' in window)) { if (onDone) onDone(); return; }
+  try { window.speechSynthesis.cancel(); } catch (e) {}
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.95;
+  u.pitch = 1.05;
+  u.volume = 1;
+  u.lang = (state.language && state.language.toLowerCase().startsWith('hi')) ? 'hi-IN' : 'en-US';
+  talkState.speaking = true;
+  u.onend = () => { talkState.speaking = false; if (onDone) onDone(); };
+  u.onerror = () => { talkState.speaking = false; if (onDone) onDone(); };
+  window.speechSynthesis.speak(u);
+}
+
+async function _talkAskAI(userMessage) {
+  _talkSetStatus('Buddy is thinking...');
+  try {
+    const res = await fetch(`${API}/ai/talk`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: userMessage,
+        history: talkState.history.slice(-20),
+        username: state.username,
+        age: state.age || 10,
+        language: state.language,
+        is_first_turn: talkState.isFirstTurn,
+      }),
+    });
+    const data = await res.json();
+    talkState.isFirstTurn = false;
+    const reply = data && data.reply ? data.reply : 'Sorry, can you say that again?';
+    talkState.history.push({ role: 'assistant', content: reply });
+    _appendTalkBubble('assistant', reply);
+    _talkSetStatus('Buddy is talking...');
+    _talkSpeak(reply, () => {
+      if (talkState.active) _talkSetStatus('Your turn - tap the mic to talk.');
+    });
+  } catch (e) {
+    _talkSetStatus('Network hiccup. Try again.');
+  }
+}
+
+function startTalkSession() {
+  if (talkState.active) return;
+  const minsSel = _talkEl('talk-duration');
+  const mins = parseInt((minsSel && minsSel.value) || '30', 10);
+  talkState.active = true;
+  talkState.endsAt = Date.now() + mins * 60000;
+  talkState.history = [];
+  talkState.isFirstTurn = true;
+  const wrap = _talkEl('talk-transcript');
+  if (wrap) wrap.innerHTML = '';
+  _talkEl('talk-mic-stage').style.display = 'flex';
+  _talkEl('talk-start-btn').style.display = 'none';
+  _talkEl('talk-end-btn').style.display = 'inline-block';
+  if (talkState.tickHandle) clearInterval(talkState.tickHandle);
+  talkState.tickHandle = setInterval(_talkUpdateTimer, 500);
+  _talkUpdateTimer();
+  const name = state.username || 'friend';
+  const greet = `Hi ${name}! I'm Buddy. How are you today?`;
+  talkState.history.push({ role: 'assistant', content: greet });
+  _appendTalkBubble('assistant', greet);
+  _talkSetStatus('Buddy is greeting you...');
+  _talkSpeak(greet, () => {
+    talkState.isFirstTurn = false;
+    if (talkState.active) _talkSetStatus('Your turn - tap the mic to talk.');
+  });
+}
+
+function endTalkSession(autoTimeup) {
+  talkState.active = false;
+  if (talkState.tickHandle) {
+    clearInterval(talkState.tickHandle);
+    talkState.tickHandle = null;
+  }
+  if (talkState.recognizer && talkState.listening) {
+    try { talkState.recognizer.stop(); } catch (e) {}
+  }
+  talkState.listening = false;
+  try { window.speechSynthesis.cancel(); } catch (e) {}
+  _talkEl('talk-mic-stage').style.display = 'none';
+  _talkEl('talk-start-btn').style.display = 'inline-block';
+  _talkEl('talk-end-btn').style.display = 'none';
+  _talkSetStatus(autoTimeup ? 'Time up! Great chat.' : 'Session ended.');
+  _appendTalkBubble('assistant', autoTimeup ? 'That was awesome! Our time is up. See you again soon! 👋' : 'Bye for now! 👋');
+}
+
+function _ensureRecognizer() {
+  if (talkState.recognizer) return talkState.recognizer;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  const r = new SR();
+  r.continuous = false;
+  r.interimResults = false;
+  r.maxAlternatives = 1;
+  r.lang = (state.language && state.language.toLowerCase().startsWith('hi')) ? 'hi-IN' : 'en-US';
+  r.onresult = (ev) => {
+    const txt = ev.results[0][0].transcript.trim();
+    if (!txt) {
+      _talkSetStatus('Did not catch that. Try again.');
+      return;
+    }
+    talkState.history.push({ role: 'user', content: txt });
+    _appendTalkBubble('user', txt);
+    _talkAskAI(txt);
+  };
+  r.onerror = (ev) => {
+    _talkSetStatus('Mic error: ' + (ev.error || 'unknown'));
+    talkState.listening = false;
+    const btn = _talkEl('talk-mic-btn');
+    if (btn) btn.classList.remove('listening');
+  };
+  r.onend = () => {
+    talkState.listening = false;
+    const btn = _talkEl('talk-mic-btn');
+    if (btn) btn.classList.remove('listening');
+  };
+  talkState.recognizer = r;
+  return r;
+}
+
+function toggleTalkMic() {
+  if (!talkState.active) return;
+  const r = _ensureRecognizer();
+  if (!r) {
+    _talkSetStatus('Voice input not supported in this browser. Try Chrome or Edge.');
+    return;
+  }
+  const btn = _talkEl('talk-mic-btn');
+  if (talkState.listening) {
+    try { r.stop(); } catch (e) {}
+    talkState.listening = false;
+    if (btn) btn.classList.remove('listening');
+    _talkSetStatus('Stopped listening.');
+    return;
+  }
+  if (talkState.speaking) {
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+    talkState.speaking = false;
+  }
+  try {
+    r.start();
+    talkState.listening = true;
+    if (btn) btn.classList.add('listening');
+    _talkSetStatus('Listening... speak now 🎤');
+  } catch (e) {
+    _talkSetStatus('Could not start mic. Check permissions.');
+  }
+}
+
+function _formatTranscriptText() {
+  return talkState.history.map((t) => {
+    const who = t.role === 'user' ? (state.username || 'You') : 'Buddy';
+    return `${who}: ${t.content}`;
+  }).join('\n');
+}
+
+function copyTalkTranscript() {
+  const txt = _formatTranscriptText();
+  if (!txt) {
+    _talkSetStatus('Nothing to copy yet.');
+    return;
+  }
+  navigator.clipboard.writeText(txt).then(() => _talkSetStatus('Transcript copied! 📋'));
+}
+
+function downloadTalkTranscript() {
+  const txt = _formatTranscriptText();
+  if (!txt) {
+    _talkSetStatus('Nothing to download yet.');
+    return;
+  }
+  const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `talk-${state.username || 'me'}-${Date.now()}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// ═════════════════════════════════════════════════════════════
+// PHOTO HELP — upload image, get kid-friendly explanation
+// ═════════════════════════════════════════════════════════════
+let _photoFile = null;
+
+function onPhotoChosen(ev) {
+  const f = ev.target.files && ev.target.files[0];
+  if (!f) return;
+  if (f.size > 8 * 1024 * 1024) {
+    alert('Image is too big. Please choose one under 8 MB.');
+    return;
+  }
+  _photoFile = f;
+  const img = document.getElementById('photo-preview');
+  if (img) {
+    img.src = URL.createObjectURL(f);
+    img.style.display = 'block';
+  }
+  const btn = document.getElementById('photo-solve-btn');
+  if (btn) btn.disabled = false;
+}
+
+async function solvePhoto() {
+  if (!_photoFile) {
+    alert('Please choose a photo first.');
+    return;
+  }
+  const q = (document.getElementById('photo-question')?.value || '').trim();
+  const resultEl = document.getElementById('photo-result');
+  const btn = document.getElementById('photo-solve-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '🦊 Looking carefully...';
+  }
+  if (resultEl) {
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = '<div class="photo-loading">🔎 Reading the photo carefully...</div>';
+  }
+  try {
+    const fd = new FormData();
+    fd.append('file', _photoFile);
+    fd.append('username', state.username || '');
+    fd.append('age', String(state.age || 10));
+    fd.append('language', state.language || 'English');
+    if (q) fd.append('question', q);
+    const res = await fetch(`${API}/ai/vision`, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error('vision_failed');
+    const data = await res.json();
+    if (data.need_clearer_image) {
+      resultEl.innerHTML = `
+        <div class="photo-card-result warn">
+          <h3>📷 I need a clearer photo</h3>
+          <p><b>Why:</b> ${escapeHtml(data.reason || 'The image is hard to read.')}</p>
+          <p><b>Tip:</b> ${escapeHtml(data.tip || 'Try better light and hold the camera steady.')}</p>
+        </div>`;
+    } else {
+      const steps = Array.isArray(data.explanation_steps) ? data.explanation_steps : [];
+      resultEl.innerHTML = `
+        <div class="photo-card-result">
+          <h3>${escapeHtml(data.subject || 'Here is what I see')}</h3>
+          <p class="photo-see"><b>What I see:</b> ${escapeHtml(data.what_i_see || '')}</p>
+          <div class="photo-answer"><b>✅ Answer:</b> ${escapeHtml(data.answer || '')}</div>
+          ${steps.length ? `<ol class="photo-steps">${steps.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>` : ''}
+          ${data.key_concept ? `<p class="photo-key">🔑 <b>Key idea:</b> ${escapeHtml(data.key_concept)}</p>` : ''}
+          ${data.encouragement ? `<p class="photo-cheer">🌟 ${escapeHtml(data.encouragement)}</p>` : ''}
+        </div>`;
+    }
+    trackActivity('ai_usage');
+  } catch (e) {
+    if (resultEl) resultEl.innerHTML = '<div class="photo-card-result warn">⚠️ Could not read the photo right now. Please try again in a moment.</div>';
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '✨ Explain it';
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
