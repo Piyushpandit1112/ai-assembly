@@ -6,7 +6,7 @@ in a simple, child-friendly format with a quiz.
 """
 
 from app.services.ai_service import call_ai, parse_json_response
-from app.utils.prompt_templates import SUBJECT_EXPLAINER_PROMPT
+from app.utils.prompt_templates import SUBJECT_EXPLAINER_PROMPT, variation_hint
 
 
 async def explain_topic(topic: str, age: int = 10, language: str = "English") -> dict:
@@ -31,6 +31,7 @@ async def explain_topic(topic: str, age: int = 10, language: str = "English") ->
         system_prompt=(
             SUBJECT_EXPLAINER_PROMPT
             + f"\nWrite all JSON values in {language} language."
+            + variation_hint(age)
         ),
         user_message=user_message,
     )
