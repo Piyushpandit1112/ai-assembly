@@ -67,14 +67,16 @@ def _fallback(idea: str) -> dict:
     }
 
 
-async def generate_idea(idea: str, language: str = "English") -> dict:
+async def generate_idea(idea: str, language: str = "English", age: int = 14) -> dict:
     """
     Take a learner's idea and return a realistic, engineering-grade plan.
     """
+    from app.utils.prompt_templates import variation_hint
     raw_response = await call_ai(
         system_prompt=(
             IDEA_GENERATOR_PROMPT
             + f"\nWrite all human-readable JSON values in {language} language. Keep URLs and tech names in English."
+            + variation_hint(age)
         ),
         user_message=f"My idea is: {idea}",
     )
