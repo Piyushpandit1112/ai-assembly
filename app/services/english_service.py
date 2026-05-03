@@ -5,10 +5,13 @@ Handles grammar/spelling correction with child-friendly explanations.
 """
 
 from app.services.ai_service import call_ai, parse_json_response
-from app.utils.prompt_templates import ENGLISH_COACH_PROMPT, ENGLISH_LESSON_PROMPT
+from app.utils.prompt_templates import (
+    ENGLISH_COACH_PROMPT, ENGLISH_LESSON_PROMPT, variation_hint,
+)
 
 
-async def correct_english(sentence: str, language: str = "English") -> dict:
+async def correct_english(sentence: str, language: str = "English",
+                          age: int = 10) -> dict:
     """
     Analyse a sentence for grammar/spelling errors.
 
@@ -21,6 +24,7 @@ async def correct_english(sentence: str, language: str = "English") -> dict:
         system_prompt=(
             ENGLISH_COACH_PROMPT
             + f"\nWrite all fields in {language} language."
+            + variation_hint(age)
         ),
         user_message=f'Please correct this sentence: "{sentence}"',
     )
@@ -42,12 +46,14 @@ async def generate_english_lesson(
     topic: str,
     level: str = "basic",
     language: str = "English",
+    age: int = 10,
 ) -> dict:
     """Generate a structured English micro-lesson with grammar + spoken + writing practice."""
     raw_response = await call_ai(
         system_prompt=(
             ENGLISH_LESSON_PROMPT
             + f"\nWrite all JSON values in {language} language."
+            + variation_hint(age)
         ),
         user_message=(
             f"Create an English lesson for topic '{topic}' at '{level}' level. "
