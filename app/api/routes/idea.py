@@ -23,6 +23,7 @@ class IdeaRequest(BaseModel):
                           example="Alex")
     language: str = Field(default="English", max_length=40,
                           example="Tamil")
+    age: int = Field(default=14, ge=4, le=99)
 
 class IdeaResponse(BaseModel):
     original_idea: str
@@ -49,7 +50,7 @@ async def generate(request: IdeaRequest):
     Take a learner's raw idea and transform it into a realistic, technically
     grounded build plan with real components, references and milestones.
     """
-    result = await generate_idea(request.idea, request.language)
+    result = await generate_idea(request.idea, request.language, request.age)
 
     return IdeaResponse(
         original_idea=request.idea,
