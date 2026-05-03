@@ -23,6 +23,7 @@ class EnglishRequest(BaseModel):
                           example="Alex")
     language: str = Field(default="English", max_length=40,
                           example="Hindi")
+    age: int = Field(default=10, ge=4, le=99)
 
 class EnglishResponse(BaseModel):
     corrected: str
@@ -38,6 +39,7 @@ class EnglishLessonRequest(BaseModel):
                        example="intermediate")
     language: str = Field(default="English", max_length=40,
                           example="Hindi")
+    age: int = Field(default=10, ge=4, le=99)
 
 
 class EnglishLessonResponse(BaseModel):
@@ -64,7 +66,7 @@ async def correct_sentence(request: EnglishRequest):
     - **mistake**: Simple explanation of what was wrong
     - **better_version**: A more expressive, richer rewrite
     """
-    result = await correct_english(request.sentence, request.language)
+    result = await correct_english(request.sentence, request.language, request.age)
 
     return EnglishResponse(
         corrected=result.get("corrected", request.sentence),
@@ -85,6 +87,7 @@ async def get_english_lesson(request: EnglishLessonRequest):
         topic=request.topic,
         level=request.level,
         language=request.language,
+        age=request.age,
     )
 
     return EnglishLessonResponse(
